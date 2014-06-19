@@ -1,62 +1,80 @@
-var canvas = document.getElementById('mycanvas');
-var ctx = canvas.getContext('2d');
-//eliminar antialias
-ctx.translate(0.5, 0.5);
 
-var c=0;
-var mycanvas;
-var container;
-var w;
-var h;
-var mouseX=0,mouseY=0;
-var mypad;
+/**
+simple geo canvas
+author: Daniel Julià
+web: kiwoo.org , pimpampum.net
+*/
 
-$(document).ready(function(){
-	
+
+function simplegeocanvas(div){
+  this.c=0;
+  this.mycanvas;
+  this.container;
+  this.w;
+  this.h;
+  this.mouseX=0;
+  this.mouseY=0;
+  this.mypad;
+  this.div=div;
+  this.zoom=1;
+  this.debug=true;
+
+}
+
+
+simplegeocanvas.prototype.init=function(){
+  var canvas = document.getElementById(this.div);
+  this.ctx = canvas.getContext('2d');
+  //remove antialias
+ this.ctx.translate(0.5, 0.5);
+
   window.requestAnimFrame = (function(callback) {
         return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
         function(callback) {
           window.setTimeout(callback, 1000 / 60);
         };
-	})();
+  })();
 
-	//Run function when browser  resize
-	$(window).resize( respondCanvas );
-	mycanvas=$('#mycanvas');
-	container = $(mycanvas);//.parent();
-	respondCanvas();
+  //Run function when browser  resizes
+  $(window).resize( this.respondCanvas );
+  this.mycanvas=$("#"+this.div);
+  this.container = $(this.mycanvas);//.parent();
+  this.respondCanvas();
+  this.mypad=new pad();
+  this.initEvents();
+  this.update();
+
+}
+
+simplegeocanvas.prototype.initEvents=function(){
 
 
+     //events
 
-  mypad=new pad();
-
-  
-	   //events
-
-    $('#mycanvas').mousedown(function(e) {
-         getPosition(e);
-        mypad.down();
+     var ref=this;
+    this.mycanvas.mousedown(function(e) {
+         ref.getPosition(e);
+        ref.mypad.down(ref.mouseX,ref.mouseY);
     });
 
-    $('#mycanvas').live('touchstart', function(e){
+    this.mycanvas.live('touchstart', function(e){
         e.preventDefault();
         e.stopPropagation();
-        getPosition(e);
-        mypad.down();
+        ref.getPosition(e);
+        ref.mypad.down(ref.mouseX,ref.mouseY);
     });
-
-     $('#mycanvas').mouseup(function(e) {
+    this.mycanvas.mouseup(function(e) {
         e.preventDefault();
-        getPosition(e);
-        mypad.up();
+        ref.getPosition(e);
+        ref.mypad.up(ref.mouseX,ref.mouseY);
     });
 
     
-   $('#mycanvas').live('touchmove', function(e){
+ this.mycanvas.live('touchmove', function(e){
     
-        getPosition(e);
-        setInfo("touchmove "+mypad.ini_mx+" "+mypad.ini_my);
-        mypad.move();
+        ref.getPosition(e);
+        ref.setInfo("touchmove "+ref.mypad.ini_mx+" "+ref.mypad.ini_my);
+        ref.mypad.move(ref.mouseX,ref.mouseY);
 
         e.stopPropagation();
         e.preventDefault();
@@ -64,37 +82,34 @@ $(document).ready(function(){
        
       });
 
- $('#mycanvas').live('touchcancel', function(e){
-         getPosition(e);
-          mypad.up();
+ this.mycanvas.live('touchcancel', function(e){
+         ref.getPosition(e);
+          ref.mypad.up();
      
     });
 
- $('#mycanvas').live('touchend', function(e){
-            mypad.up();
+ this.mycanvas.live('touchend', function(e){
+            ref.mypad.up();
      
     });
 
  //  canvas.addEventListener('touchend',ended, false);
 
-      $('#mycanvas').mousemove(function(e) {
+      this.mycanvas.mousemove(function(e) {
       // jQuery would normalize the event
        e.preventDefault();
-	     getPosition(e);
-       setInfo("mousemove "+mypad.ini_mx+" "+mypad.ini_my);
+       ref.getPosition(e);
+       ref.setInfo("mousemove "+ref.mypad.ini_mx+" "+ref.mypad.ini_my);
     
-	     mypad.move();
+       ref.mypad.move();
 
-	  })
+    })
 
-      update();
+     
+}
 
-});
-
-
-
-function setInfo(txt,b){
-  if(!debug) return;
+simplegeocanvas.prototype.setInfo=function(txt,b){
+  if(!this.debug) return;
   $('#info').html(txt);
   if(b){
     setTimeout("hideInfo()",2000);
@@ -102,44 +117,46 @@ function setInfo(txt,b){
 
 }
 
-function hideInfo(){
+simplegeocanvas.prototype.hideInfo=function(){
   $('#info').hide();
 }
 
-function respondCanvas(){
+simplegeocanvas.prototype.respondCanvas=function(){
 
-	w=$(container).width();
-	h=$(container).height();
-	
+  this.w=$(this.container).width();
+  this.h=$(this.container).height();
+  
 //$('#content').attr('height', w/rzoom-58); 
 
   //tamaño en pixels del canvas
-	mycanvas.attr('width', w/zoom); //max width
-	mycanvas.attr('height', h/zoom ); //max height
-	
-	update();
+  console.log(this.mycanvas);
+  this.mycanvas.attr('width', this.w/this.zoom); //max width
+  this.mycanvas.attr('height', this.h/this.zoom ); //max height
+  
+  this.update();
 
 }
 
+simplegeocanvas.prototype.update=function(){ 
+
+    this.ctx.fillStyle='#ffffff';
+    this.ctx.beginPath();
+    this.ctx.fillRect(0,0,this.w,this.h);
 
 
-function update(){
-
-  	ctx.fillStyle='#ffffff';
-    ctx.beginPath();
-  	ctx.fillRect(0,0,w,h);
- 
-   if(mypad){
-     mypad.update();
-     mypad.paint();
+  
+   if(this.mypad){
+     this.mypad.update();
+     this.mypad.paint(this.ctx,this.w,this.h);
     }
+    var ref=this;
    requestAnimFrame(function() {
-      update();
+      ref.update();
   });
 }
 
+simplegeocanvas.prototype.getPosition=function(e){ 
 
-function getPosition(e) {
   var mx,my;
   if(e.originalEvent.touches){
     mx = Math.floor(e.originalEvent.touches[0].pageX/zoom);
@@ -160,16 +177,17 @@ function getPosition(e) {
 
     var x = e.pageX - $(targ).offset().left;
     var y = e.pageY - $(targ).offset().top;
-    mx=Math.floor(x/zoom);
-    my=Math.floor(y/zoom);
+    mx=Math.floor(x/this.zoom);
+    my=Math.floor(y/this.zoom);
 
   }
   if(mx!=0 && my!=0){
-    mouseX=mx;
-    mouseY=my;
+    this.mouseX=mx;
+    this.mouseY=my;
   }
 
 };
+
 
 
 
@@ -178,6 +196,7 @@ function pad(){
   this.points=new Array();
   this.center={'lat':41,'lng':2};
   this.zoom=1;
+  this.captured=false;
 
 }
 
@@ -194,7 +213,7 @@ pad.prototype.pos2geo=function(x,y){
 }
 
 
-pad.prototype.paint=function(){
+pad.prototype.paint=function(ctx,w,h){
   //if(this.captured){ 
   ctx.beginPath();
   ctx.strokeStyle="#000000";//rgba(128,128,128,0.5)";
@@ -202,6 +221,7 @@ pad.prototype.paint=function(){
 
   for(var lng=-180;lng<180;lng++){
     var p=this.geo2pos(0,lng);
+
     ctx.moveTo(p[1],0);
     ctx.fillStyle = "Red";
     ctx.fillText(lng,p[1],12);
@@ -219,7 +239,7 @@ pad.prototype.paint=function(){
   }
 
 
-   //pintar los puntos donde se ha clicado
+   //paint clicked locations
    for(var c=0;c<this.points.length;c++){
     var p=this.points[c];
  
@@ -243,8 +263,9 @@ pad.prototype.update=function(ctx){
 }
 
 
-pad.prototype.down=function(dragging){
+pad.prototype.down=function(mouseX,mouseY){
 
+console.log(mouseX,mouseY);
   var res=this.pos2geo(mouseY,mouseX);
 
   this.points.push({lat:res[0]+this.center.lat,lng:res[1]+this.center.lng,color:get_random_color()});
@@ -253,7 +274,7 @@ pad.prototype.down=function(dragging){
   this.init={x:mouseX,y:mouseY};
 }
 
-pad.prototype.move=function(){
+pad.prototype.move=function(mouseX,mouseY){
   if(this.captured){
    
    var dx=mouseX-this.init.x;
@@ -270,7 +291,7 @@ pad.prototype.move=function(){
 }
 
 
-pad.prototype.up=function(){
+pad.prototype.up=function(mouseX,mouseY){
  // this.points.push({x:mouseX,y:mouseY,color:get_random_color()});
   this.captured=false;
 }
