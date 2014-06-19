@@ -19,14 +19,39 @@
 </div>
 <div id="info">loading...</div>
 
-<!-- Development version: -->
+<!-- Only for development version (avoiding cache): -->
 <script>document.write('<script src="js/canvas.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
-<script>
+<script> 
 	var mygeo;
 
 	$(document).ready(function(){ 
 		mygeo=new simplegeocanvas("mycanvas");
 		mygeo.init();
+
+		mygeo.onDown=function(e){ 
+
+			$('#info').prepend("down<br>");
+
+
+  			
+
+			console.log(e.mouseX,e.mouseY,"down",e);
+		}
+		mygeo.onUp=function(e){ 
+			$('#info').prepend("up<br>");
+			console.log("up",e);
+		}
+		mygeo.onMove=function(e){ 
+			//console.log("move",e);
+		}
+		mygeo.onPaint=function(e){ 
+			//console.log("paint",e);
+
+			e.ctx.strokeStyle="#000000";
+			e.ctx.beginPath();
+      		e.ctx.arc(e.mouseX,e.mouseY,20,0,2*Math.PI);
+      		e.ctx.stroke();
+		}
 	});
 
 </script>
