@@ -43,6 +43,17 @@ simplecanvas.prototype.init=function(){
   this.initEvents();
   this.update();
 
+  //stats
+   this.stats = new Stats();
+  this.stats.setMode(0); // 0: fps, 1: ms
+
+  // Align top-left
+  this.stats.domElement.style.position = 'absolute';
+  this.stats.domElement.style.left = '0px';
+  this.stats.domElement.style.top = '0px';
+
+  document.body.appendChild( this.stats.domElement );
+
 }
 
 simplecanvas.prototype.initEvents=function(){
@@ -150,10 +161,16 @@ simplecanvas.prototype.update=function(){
 }
 
 simplecanvas.prototype.paint=function(){ 
+  if(this.stats)
+    this.stats.begin();
+
+ 
+
   this.ctx.fillStyle='#aaaaaa';
     this.ctx.beginPath();
     this.ctx.fillRect(0,0,this.w,this.h);
     this.onPaint(this);
+    if(this.stats) this.stats.end();
 
 }
 
