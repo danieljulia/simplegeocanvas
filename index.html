@@ -17,7 +17,7 @@
 <canvas id="mycanvas">
 </canvas>
 </div>
-<div id="info">loading...</div>
+
 <script src="js/stats.min.js"></script>
 <!-- Only for development version (avoiding cache): -->
 <script>document.write('<script src="js/canvas.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
@@ -27,29 +27,64 @@
 
 
 
-var mygeo;
+var mygeo; //simple geo canvas
+
+//my data
+var points=new Array();
+var captured=false;
+var point_ini={x:0,y:0};
+var point_dest={x:0,y:0};
+var point_moving={x:0,y:0};
 
 $(document).ready(function(){ 
 	mygeo=new simplegeocanvas("mycanvas");
 	mygeo.init();
 
 	mygeo.onDown=function(e){ 
-		$('#info').prepend("down<br>");
+		points.push({x:e.mouseX,y:e.mouseY});
 		console.log(e.mouseX,e.mouseY,"down",e);
+		point_ini={x:e.mouseX,y:e.mouseY};
+		captured=true;
 	}
 	mygeo.onUp=function(e){ 
-		$('#info').prepend("up<br>");
+
 		console.log("up",e);
+		captured=false;
 	}
 	mygeo.onMove=function(e){ 
-		//console.log("move",e);
+		point_dest={x:e.mouseX,y:e.mouseY};
+		point_moving={x:e.mouseX,y:e.mouseY};
+
 	}
 	mygeo.onPaint=function(e){ 
-		//console.log("paint",e);
+		
 		e.ctx.strokeStyle="#000000";
-		e.ctx.beginPath();
-  		e.ctx.arc(e.mouseX,e.mouseY,20,0,2*Math.PI);
-  		e.ctx.stroke();
+
+		for(var i=0;i<points.length;i++){
+				var p=points[i];
+			e.ctx.beginPath();
+	  		e.ctx.arc(p.x,p.y,20,0,2*Math.PI);
+	  		e.ctx.stroke();
+  		}
+
+  		if(captured){
+			e.ctx.beginPath();
+			//e.ctx.strokeStyle="#000000";
+			//e.ctx.lineWidth = 1;
+
+			e.ctx.moveTo(point_ini.x,point_ini.y);
+			e.ctx.lineTo(point_dest.x,point_dest.y);
+			e.ctx.stroke();
+
+	
+
+  		}
+
+  				//moving
+			e.ctx.beginPath();
+	  		e.ctx.arc(point_moving.x,point_moving.y,5,0,2*Math.PI);
+	  		e.ctx.stroke();
+
 	}
 });
 

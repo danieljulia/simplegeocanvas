@@ -14,7 +14,7 @@ function simplecanvas(div){
   this.h;
   this.mouseX=0;
   this.mouseY=0;
-  
+  this.stats_has=true;
   this.zoom=1;
   this.debug=true;
 
@@ -43,16 +43,20 @@ simplecanvas.prototype.init=function(){
   this.initEvents();
   this.update();
 
+
   //stats
-   this.stats = new Stats();
-  this.stats.setMode(0); // 0: fps, 1: ms
+  if(this.stats_has){ 
+    this.stats = new Stats();
+    this.stats.setMode(0); // 0: fps, 1: ms
 
-  // Align top-left
-  this.stats.domElement.style.position = 'absolute';
-  this.stats.domElement.style.left = '0px';
-  this.stats.domElement.style.top = '0px';
+    // Align top-left
+    this.stats.domElement.style.position = 'absolute';
+    this.stats.domElement.style.left = '0px';
+    this.stats.domElement.style.top = '0px';
 
-  document.body.appendChild( this.stats.domElement );
+    document.body.appendChild( this.stats.domElement );
+
+  }
 
 }
 
@@ -60,20 +64,34 @@ simplecanvas.prototype.initEvents=function(){
 
      //events
     var ref=this;
-    this.mycanvas.mousedown(function(e) {
-        ref.getPosition(e);
-        ref.doDown(ref);
-        ref.onDown(ref);
+
+  this.mycanvas.mousedown(function(e) {
+    console.log("mousedown",e);
+      ref.getPosition(e);
+      ref.doDown(ref);
+      ref.onDown(ref);
+  });
+
+/*
+  $(window).live('touchstart', function(e){
+      console.log("w touchstart",e);
+
     });
 
-    this.mycanvas.live('touchstart', function(e){
+*/
+
+
+     $(this.mycanvas).live('touchstart', function(e){
+      console.log("touchstart",e);
         e.preventDefault();
         e.stopPropagation();
         ref.getPosition(e);
         ref.doDown(ref);
         ref.onDown(ref);
     });
+
     this.mycanvas.mouseup(function(e) {
+      console.log("mouseup",e);
         e.preventDefault();
         ref.getPosition(e);
         ref.doUp(ref);
@@ -82,7 +100,7 @@ simplecanvas.prototype.initEvents=function(){
 
     
  this.mycanvas.live('touchmove', function(e){
-    
+    //console.log("touchmove",e);
         ref.getPosition(e);
         ref.doMove(ref);
          ref.onMove(ref);
@@ -94,6 +112,7 @@ simplecanvas.prototype.initEvents=function(){
       });
 
  this.mycanvas.live('touchcancel', function(e){
+  console.log("touchcancel",e);
          ref.getPosition(e);
          ref.doUp(ref);
           ref.onUp(ref);
@@ -101,40 +120,29 @@ simplecanvas.prototype.initEvents=function(){
     });
 
  this.mycanvas.live('touchend', function(e){
-  ref.doUp(ref);
-           ref.onUp(ref);
-     
-    });
+    console.log("touchend",e);
+    ref.doUp(ref);
+    ref.onUp(ref);
+   
+  });
 
  //  canvas.addEventListener('touchend',ended, false);
 
-      this.mycanvas.mousemove(function(e) {
-      // jQuery would normalize the event
-       e.preventDefault();
-       ref.getPosition(e);
+  this.mycanvas.mousemove(function(e) {
+   // console.log("mousemove",e);
+  // jQuery would normalize the event
+   e.preventDefault();
+   ref.getPosition(e);
 
     ref.doMove(ref);
-        ref.onMove(ref);
+    ref.onMove(ref);
 
     })
 
      
 }
 
-/*
-simplecanvas.prototype.setInfo=function(txt,b){
-  if(!this.debug) return;
-  $('#info').html(txt);
-  if(b){
-    setTimeout("hideInfo()",2000);
-  }
 
-}
-
-simplecanvas.prototype.hideInfo=function(){
-  $('#info').hide();
-}
-*/
 simplecanvas.prototype.respondCanvas=function(){
 
   this.w=$(this.container).width();
@@ -143,7 +151,7 @@ simplecanvas.prototype.respondCanvas=function(){
 //$('#content').attr('height', w/rzoom-58); 
 
   //tamaño en pixels del canvas
-  console.log(this.w,this.h);
+  console.log("size changed",this.w,this.h);
   console.log(this);
   $(this.mycanvas).attr('width', this.w/this.zoom); //max width
    $(this.mycanvas).attr('height', this.h/this.zoom ); //max height
