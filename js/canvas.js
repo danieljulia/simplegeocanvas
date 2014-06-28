@@ -186,8 +186,8 @@ simplecanvas.prototype.getPosition=function(e){
 
   var mx,my;
   if(e.originalEvent.touches){
-    mx = Math.floor(e.originalEvent.touches[0].pageX/zoom);
-    my = Math.floor(e.originalEvent.touches[0].pageY/zoom);
+    mx = Math.floor(e.originalEvent.touches[0].pageX/this.zoom);
+    my = Math.floor(e.originalEvent.touches[0].pageY/this.zoom);
   }else{
 
 
