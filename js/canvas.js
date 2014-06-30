@@ -14,6 +14,7 @@ function simplecanvas(div){
   this.h;
   this.mouseX=0;
   this.mouseY=0;
+  this.ispinching=false;
   this.stats_has=true;
   this.zoom=1;
   this.debug=true;
@@ -83,6 +84,23 @@ simplecanvas.prototype.initEvents=function(){
 
      $(this.mycanvas).live('touchstart', function(e){
       console.log("touchstart",e);
+
+        if(e.originalEvent.touches.length==2){
+            //pinch
+            ref.ispinching=true;
+            
+            console.log(e.originalEvent.touches);
+            var x1 = Math.floor(e.originalEvent.touches[0].pageX/ref.zoom);
+            var y1 = Math.floor(e.originalEvent.touches[0].pageY/ref.zoom);
+            var x2 = Math.floor(e.originalEvent.touches[1].pageX/ref.zoom);
+            var y2 = Math.floor(e.originalEvent.touches[1].pageY/ref.zoom);
+
+            var mx=(x1+x2)/2;
+             var my=(y1+y2)/2;
+             var d=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+             console.log("pinch",mx,my,d);
+        }
+
         e.preventDefault();
         e.stopPropagation();
         ref.getPosition(e);
@@ -100,16 +118,20 @@ simplecanvas.prototype.initEvents=function(){
 
     
  this.mycanvas.live('touchmove', function(e){
+  if(ref.ispinching){
+  console.log("pinching...");
+  }
     //console.log("touchmove",e);
         ref.getPosition(e);
         ref.doMove(ref);
-         ref.onMove(ref);
+        ref.onMove(ref);
 
         e.stopPropagation();
         e.preventDefault();
         return false;
        
       });
+  
 
  this.mycanvas.live('touchcancel', function(e){
   console.log("touchcancel",e);
@@ -120,6 +142,7 @@ simplecanvas.prototype.initEvents=function(){
     });
 
  this.mycanvas.live('touchend', function(e){
+    ref.ispinching=false;
     console.log("touchend",e);
     ref.doUp(ref);
     ref.onUp(ref);
@@ -128,16 +151,16 @@ simplecanvas.prototype.initEvents=function(){
 
  //  canvas.addEventListener('touchend',ended, false);
 
-  this.mycanvas.mousemove(function(e) {
-   // console.log("mousemove",e);
-  // jQuery would normalize the event
-   e.preventDefault();
-   ref.getPosition(e);
+    this.mycanvas.mousemove(function(e) {
+     // console.log("mousemove",e);
+    // jQuery would normalize the event
+     e.preventDefault();
+     ref.getPosition(e);
 
-    ref.doMove(ref);
-    ref.onMove(ref);
+      ref.doMove(ref);
+      ref.onMove(ref);
 
-    })
+      });
 
      
 }
