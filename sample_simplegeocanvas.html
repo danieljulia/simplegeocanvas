@@ -13,6 +13,10 @@
 
 
 <div id="content">
+<div class="menu">
+Show grid: <input id="showgrid" type="checkbox">
+Blah: <input id="blah" type="checkbox">
+</div>
 <canvas id="mycanvas">
 </canvas>
 </div>
@@ -55,6 +59,17 @@ $(document).ready(function(){
 
 
 	}
+
+
+	 $('#showgrid').click(function() {
+        if ($(this).is(':checked')) {
+           mygeo.showguides=true;
+        }else{
+        	 mygeo.showguides=false;
+        }
+    });
+
+
 });
 
 </script>

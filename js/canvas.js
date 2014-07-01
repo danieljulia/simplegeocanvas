@@ -88,17 +88,10 @@ simplecanvas.prototype.initEvents=function(){
         if(e.originalEvent.touches.length==2){
             //pinch
             ref.ispinching=true;
-            
-            console.log(e.originalEvent.touches);
-            var x1 = Math.floor(e.originalEvent.touches[0].pageX/ref.zoom);
-            var y1 = Math.floor(e.originalEvent.touches[0].pageY/ref.zoom);
-            var x2 = Math.floor(e.originalEvent.touches[1].pageX/ref.zoom);
-            var y2 = Math.floor(e.originalEvent.touches[1].pageY/ref.zoom);
-
-            var mx=(x1+x2)/2;
-             var my=(y1+y2)/2;
-             var d=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
-             console.log("pinch",mx,my,d);
+            var d=ref.pinchDist(e);
+            ref.pinching_inid=d;
+            ref.scaleini=ref.scale;
+          
         }
 
         e.preventDefault();
@@ -119,7 +112,11 @@ simplecanvas.prototype.initEvents=function(){
     
  this.mycanvas.live('touchmove', function(e){
   if(ref.ispinching){
-  console.log("pinching...");
+     var d=ref.pinchDist(e);
+     console.log("pinching",ref.scaleini,ref.pinching_inid/d);
+     ref.scale=ref.scaleini/(ref.pinching_inid/d);
+
+ 
   }
     //console.log("touchmove",e);
         ref.getPosition(e);
@@ -164,6 +161,21 @@ simplecanvas.prototype.initEvents=function(){
 
      
 }
+
+
+simplecanvas.prototype.pinchDist=function(e){
+    var x1 = Math.floor(e.originalEvent.touches[0].pageX/this.zoom);
+    var y1 = Math.floor(e.originalEvent.touches[0].pageY/this.zoom);
+    var x2 = Math.floor(e.originalEvent.touches[1].pageX/this.zoom);
+    var y2 = Math.floor(e.originalEvent.touches[1].pageY/this.zoom);
+
+    var mx=(x1+x2)/2;
+    var my=(y1+y2)/2;
+    var d=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+    return d;
+}
+
+
 
 
 simplecanvas.prototype.respondCanvas=function(){
@@ -348,6 +360,8 @@ simplegeocanvas.prototype.paint=function(e){
 }
 
    //draw markers 
+    this.ctx.fillStyle = "rgba(128,128,128,128)";
+
    for(var c=0;c<this.markers.length;c++){
     var p=this.markers[c];
  
