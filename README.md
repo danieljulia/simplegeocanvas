@@ -14,3 +14,8 @@ Specs
 - Has pinch in/out touch events and the mouse wheel to change zoom
 
 Please be aware that it's still under heavy development
+
+
+Test de demo at
+http://danieljulia.github.io/simplegeocanvas/
+

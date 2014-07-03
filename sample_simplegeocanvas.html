@@ -23,7 +23,7 @@ Blah: <input id="blah" type="checkbox">
 
 <script src="js/stats.min.js"></script>
 <!-- Only for development version (avoiding cache): -->
-<script>document.write('<script src="js/canvas.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
+<script>document.write('<script src="js/simplegeocanvas.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
 <script> 
 
 
@@ -43,13 +43,18 @@ $(document).ready(function(){
 		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
 	}
 	mygeo.onDown=function(e){ 
-		console.log("clicat a  :",e.lat,e.lng);
-		mygeo.addMarker(e.lat,e.lng,"#0000ff","Clicked");
+		
 	}
 	mygeo.onUp=function(e){ 
 
 		
 	}
+	mygeo.onClick=function(e){ 
+		console.log("cliked at  :",e.lat,e.lng);
+		mygeo.addMarker(e.lat,e.lng,"#0000ff","Clicked");
+		
+	}
+
 	mygeo.onMove=function(e){ 
 		
 
