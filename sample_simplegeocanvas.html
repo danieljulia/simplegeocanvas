@@ -1,0 +1,78 @@
+
+<!doctype html>
+<html>
+<head>
+<title>Simple Geo Canvas</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
+<link rel='stylesheet'  href='css/style.css' type='text/css' media='all' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+
+</head>
+<body id="vis">
+
+
+<div id="content">
+<div class="menu">
+Show grid: <input id="showgrid" type="checkbox">
+Blah: <input id="blah" type="checkbox">
+</div>
+<canvas id="mycanvas">
+</canvas>
+</div>
+
+<script src="js/stats.min.js"></script>
+<!-- Only for development version (avoiding cache): -->
+<script>document.write('<script src="js/canvas.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
+<script> 
+
+
+
+
+
+var mygeo; //simple geo canvas
+
+
+
+
+$(document).ready(function(){ 
+	mygeo=new simplegeocanvas("mycanvas");
+	mygeo.init();
+
+	for(var i=0;i<1000;i++){ 
+		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
+	}
+	mygeo.onDown=function(e){ 
+		console.log("clicat a  :",e.lat,e.lng);
+		mygeo.addMarker(e.lat,e.lng,"#0000ff","Clicked");
+	}
+	mygeo.onUp=function(e){ 
+
+		
+	}
+	mygeo.onMove=function(e){ 
+		
+
+	}
+	mygeo.onPaint=function(e){ 
+		
+
+
+	}
+
+
+	 $('#showgrid').click(function() {
+        if ($(this).is(':checked')) {
+           mygeo.showguides=true;
+        }else{
+        	 mygeo.showguides=false;
+        }
+    });
+
+
+});
+
+</script>
+
+</body>
+</html>
