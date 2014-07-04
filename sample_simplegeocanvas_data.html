@@ -19,6 +19,13 @@ Blah: <input id="blah" type="checkbox">
 </div>
 <canvas id="mycanvas">
 </canvas>
+
+
+<div class="controls">
+	<form id="myform" action="javascript:send()">
+	<input id="tag1" type="text" placeholder="type a tag"><input id="button1" type="submit" value="ok">
+	</form>
+</div>
 </div>
 
 <script src="js/stats.min.js"></script>
@@ -28,7 +35,7 @@ Blah: <input id="blah" type="checkbox">
 
 
 
-
+var api_url="http://www.pimpampum.net/labs/mapr/api/api.php?method=get_photos&tag=";
 
 var mygeo; //simple geo canvas
 
@@ -43,13 +50,7 @@ $(document).ready(function(){
 	mygeo.center.lng=2;
 	mygeo.scale=50;
 
-	$.getJSON("data/playa.json",function(data){
-		console.log("adding markers");
-		$.each(data.res,function(i,val){
-			mygeo.addMarker(val.lat/1000,val.lng/1000,"#0000ff",val.id);
-			
-		});
-	});
+	searchTag("playa");
 
 	for(var i=0;i<1000;i++){ 
 		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
@@ -84,9 +85,32 @@ $(document).ready(function(){
         }
     });
 
-
+/*
+	 $('#button1').click(function(){
+	 	var tag=$('#tag1').val();
+	 	if(tag=="") return;
+	 	searchTag(tag);
+ 	 });
+*/
 });
 
+function send(){
+ 	var tag=$('#tag1').val();
+	 	if(tag=="") return;
+	 	searchTag(tag);
+}
+function searchTag(tag){
+	console.log(api_url+tag);
+	var tag_color=get_random_color();
+
+	$.getJSON(api_url+tag+"&callback=?",function(data){
+		console.log("adding markers");
+		$.each(data.res,function(i,val){
+			mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id);
+			
+		});
+	});
+}
 </script>
 
 </body>

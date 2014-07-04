@@ -113,12 +113,13 @@ simplecanvas.prototype.initEvents=function(){
     
  this.mycanvas.live('touchmove', function(e){
   if(ref.ispinching){
+      //zoom in zoom out
+      //probably should be on doScale
      var d=ref.pinchDist(e);
-     
      ref.scale=ref.scaleini/(ref.pinching_inid/d);
-
- 
+     return;
   }
+
     //console.log("touchmove",e);
         ref.getPosition(e);
         ref.doMove(ref);
@@ -159,6 +160,15 @@ simplecanvas.prototype.initEvents=function(){
       ref.onMove(ref);
 
       });
+
+    this.mycanvas.bind('mousewheel', function(e){
+        if(e.originalEvent.wheelDelta /120 > 0) {
+           ref.doScale(2);
+        }
+        else{
+           ref.doScale(0.5);
+        }
+    });
 
      
 }
@@ -283,6 +293,9 @@ simplecanvas.prototype.doMove=function(e){
 
 
 }
+simplecanvas.prototype.doScale=function(scale){
+
+}
 
 /**
 geo canvas
@@ -322,10 +335,6 @@ simplegeocanvas.prototype.paint=function(e){
     if(this.stats)
     this.stats.begin();
 
- 
-
-
-  
 
    this.ctx.fillStyle = "White";
   this.ctx.fillRect(0,0,this.w,this.h);
@@ -389,6 +398,11 @@ simplegeocanvas.prototype.paint=function(e){
   }
 
      if(this.stats) this.stats.end();
+
+}
+simplegeocanvas.prototype.doScale=function(sc){
+    this.scale=this.scale*sc;
+    if(this.scale>12000) this.scale=12000;
 
 }
 
