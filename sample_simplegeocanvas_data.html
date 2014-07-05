@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
 <link rel='stylesheet'  href='css/style.css' type='text/css' media='all' />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-
+<script src="js/color.js"></script>
 </head>
 <body id="vis">
 
@@ -60,7 +60,10 @@ $(document).ready(function(){
 	}
 	mygeo.onClick=function(e){ 
 
-		mygeo.addMarker(e.lat,e.lng,"#ff0000","Clicked");
+		if(mygeo.roll!=-1){
+			console.log("clicking on ",mygeo.roll);
+		}
+		//mygeo.addMarker(e.lat,e.lng,"#ff0000","Clicked");
 	}
 	mygeo.onUp=function(e){ 
 
@@ -101,7 +104,7 @@ function send(){
 }
 function searchTag(tag){
 	console.log(api_url+tag);
-	var tag_color=get_random_color();
+	var tag_color=get_random_color_ex();
 
 	$.getJSON(api_url+tag+"&callback=?",function(data){
 		console.log("adding markers");
