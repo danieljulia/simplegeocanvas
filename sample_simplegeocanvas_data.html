@@ -51,6 +51,8 @@ $(document).ready(function(){
 	mygeo.scale=50;
 
 	searchTag("playa");
+	searchTag("platja");
+	searchTag("barcelona");
 
 	for(var i=0;i<1000;i++){ 
 		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
@@ -110,8 +112,9 @@ function searchTag(tag){
 
 	$.getJSON(api_url+tag+"&callback=?",function(data){
 		console.log("adding markers");
+		mygeo.addLayer(tag_color,tag);
 		$.each(data.res,function(i,val){
-			mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id);
+			mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id,tag);
 			
 		});
 	});

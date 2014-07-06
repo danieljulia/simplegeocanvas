@@ -306,12 +306,16 @@ function simplegeocanvas(div){
   this.div=div;
   this.center={'lat':0,'lng':0};
   this.zoom=1;
+
+  this.layers=new Array();
   this.scale=50;
   this.markers=new Array();
   this.showguides=false;
   this.sz=2; //size of marker
   this.roll=-1; //current rolled marker
   this.selected=-1; //current selected marker
+
+  this.currentLayer="";
 }
 
 simplegeocanvas.prototype = new simplecanvas(this.div );
@@ -330,8 +334,8 @@ simplegeocanvas.prototype.pos2geo=function(x,y){
   return [lat,lng];
 }
 
-simplegeocanvas.prototype.addMarker=function(lat,lng,color,txt){
-  this.markers.push({'lat':lat,'lng':lng,'color':color,'txt':txt});
+simplegeocanvas.prototype.addMarker=function(lat,lng,color,txt,layer){
+  this.markers.push({'lat':lat,'lng':lng,'color':color,'txt':txt,'layer':layer});
 }
 
 
@@ -423,8 +427,8 @@ simplegeocanvas.prototype.paint=function(e){
 
    for(var c=0;c<this.markers.length;c++){
     var p=this.markers[c];
- 
-    this.paintMarker(p);
+    if(this.currentLayer=="" || p.layer==this.currentLayer)
+     this.paintMarker(p);
   }
 
   if(this.selected!=-1) this.paintMarker(this.selected);
@@ -459,6 +463,57 @@ simplegeocanvas.prototype.paintMarker=function(p){
          }
 
     }
+}
+
+simplegeocanvas.prototype.addLayer=function(color,label){
+  this.layers.push({color:color,label:label});
+}
+
+simplegeocanvas.prototype.selectLayer=function(label){
+  this.currentLayer=label;
+}
+simplegeocanvas.prototype.centerLayer=function(label){
+    var lat=0;
+    var lng=0;
+    var count=0;
+    var d=0;
+    var countd=0;
+
+    for(var c=0;c<this.markers.length;c++){
+      var p=this.markers[c];
+      if(p.layer==label){
+        lat+=p.lat;
+        lng+=p.lng;
+        if(c%20){ //sampling distances
+          d+=Math.sqrt( (p.lat-lat)*(p.lat-lat)+(p.lng-lng)*(p.lng-lng));
+          countd++;
+
+        }
+        count++;
+      }
+    }
+
+lat=lat/count;
+    lng=lng/count;
+
+     for(var c=0;c<this.markers.length;c++){
+      var p=this.markers[c];
+        if(c%20){ //sampling distances
+          d+=Math.sqrt( (p.lat-lat)*(p.lat-lat)+(p.lng-lng)*(p.lng-lng));
+          countd++;
+
+        }
+     }
+
+    
+    this.center.lat=lat;
+    this.center.lng=lng;
+    var averagedist=d/countd;
+
+    var sc=200000/averagedist;
+    if(this.scale>sc) this.scale=sc;
+    console.log("dades ",lat,lng,d,averagedist,count);
+
 }
 
 simplegeocanvas.prototype.doScale=function(sc){
@@ -530,6 +585,12 @@ function get_random_color_ex() {
 
 }
 
+
+//markers
+
+function geomarker(){
+
+}
 
  
 
