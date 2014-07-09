@@ -1,4 +1,3 @@
-
 /**
 simple geo canvas
 author: Daniel Julià
@@ -290,6 +289,12 @@ simplecanvas.prototype.doUp=function(e){
 
 
 }
+
+simplecanvas.prototype.doUpdate=function(e){
+
+
+}
+
 simplecanvas.prototype.doMove=function(e){
 
 
@@ -316,6 +321,13 @@ function simplegeocanvas(div){
   this.selected=-1; //current selected marker
 
   this.currentLayer="";
+
+  
+  var self=this;
+  setInterval(function(){
+    self.hashPut();
+  },1000);
+
 }
 
 simplegeocanvas.prototype = new simplecanvas(this.div );
@@ -369,7 +381,7 @@ simplegeocanvas.prototype.doUpdate=function(){
 
   if(this.roll!=-1){
     this.roll.roll=true;
-   
+     this.onRoll(this.roll);
   }
 
 
@@ -422,8 +434,8 @@ simplegeocanvas.prototype.paint=function(e){
     this.ctx.fillStyle = "rgba(128,128,128,128)";
 
     //size of marker depends of scale
-    this.sz=Math.floor(this.scale/2000); //2000 is ok
-    if(this.sz<2) this.sz=2;
+    this.sz=Math.floor(this.scale/100000); //2000 is ok
+    if(this.sz<1) this.sz=1;
 
    for(var c=0;c<this.markers.length;c++){
     var p=this.markers[c];
@@ -452,9 +464,9 @@ simplegeocanvas.prototype.paintMarker=function(p){
               if(p.roll) this.ctx.fillStyle="#f00";
               if(p==this.selected) this.ctx.fillStyle="#ff0";
               this.ctx.beginPath();
-              this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+              //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
 
-             // this.ctx.arc(x,y,sz*2,0,2*Math.PI);
+              this.ctx.arc(x,y,this.sz*2,0,2*Math.PI);
               this.ctx.fill();
 
               p.x=x;
@@ -467,6 +479,28 @@ simplegeocanvas.prototype.paintMarker=function(p){
 
 simplegeocanvas.prototype.addLayer=function(color,label){
   this.layers.push({color:color,label:label});
+}
+
+//remove layer and all its markers
+simplegeocanvas.prototype.removeLayer=function(label){
+  for(var i=0;i<this.layers.length;i++){
+    if(this.layers[i].label==label){
+      this.layers.splice(i,1);
+
+
+        for(var j=this.markers.length-1;j>0;j--){
+          if(this.markers[j].layer==label){
+           
+            this.markers.splice(j,1);
+          }
+        }
+
+      return true;
+    }
+
+  }
+  return false;
+ 
 }
 
 simplegeocanvas.prototype.selectLayer=function(label){
@@ -558,11 +592,46 @@ simplegeocanvas.prototype.doMove=function(e){
     this.center.lat-=res[0];
     this.center.lng-=res[1];
     this.ini={x:e.mouseX,y:e.mouseY};
+
+    
+
+  }
 }
 
-  
+simplegeocanvas.prototype.onRoll=function(e){
 
 }
+
+simplegeocanvas.prototype.hashGet=function(e){
+
+}
+
+
+simplegeocanvas.prototype.hashPut=function(){
+  //can become very slow
+  var hash="lat="+round_number(this.center.lat,6);
+  hash+="&lng="+round_number(this.center.lng,6);
+  hash+="&scale="+this.scale;
+  this.addHash(hash);
+}
+
+
+simplegeocanvas.prototype.addHash=function(hash){
+  if(history.pushState) {
+    history.pushState(null, null, '#'+hash);
+  }
+  else {
+      location.hash = '#'+hash;
+  }
+
+}
+
+
+
+function round_number(num, dec) {
+    return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
+}
+
 
 function get_random_color() {
    
@@ -575,6 +644,7 @@ function get_random_color() {
     return color;
 }
 
+/*
 function get_random_color_ex() {
     var c=new Array();
     for(var i=0;i<3;i++){
@@ -584,6 +654,17 @@ function get_random_color_ex() {
     return color;
 
 }
+*/
+function get_random_color_ex(){
+  var ch=(Math.floor( Math.random()*60 )*6);
+  var col=tinycolor({ h: ch, s: 80, v: 100 });
+  var color="rgba("+Math.floor(col._r)+","+Math.floor(col._g)+","+Math.floor(col._b)+","+0.7+")";
+  return color;
+
+}
+
+
+
 
 
 //markers
