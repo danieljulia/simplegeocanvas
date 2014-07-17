@@ -346,12 +346,13 @@ simplegeocanvas.prototype.pos2geo=function(x,y){
   return [lat,lng];
 }
 
-simplegeocanvas.prototype.addMarker=function(lat,lng,color,txt,layer){
-  this.markers.push({'lat':lat,'lng':lng,'color':color,'txt':txt,'layer':layer});
+simplegeocanvas.prototype.addMarker=function(m){
+  this.markers.push(m);
 }
 
 
 simplegeocanvas.prototype.doUpdate=function(){
+
   var dtrigger=20;
   var dmin=100;
  
@@ -375,8 +376,25 @@ simplegeocanvas.prototype.doUpdate=function(){
   }
 
    for(var c=0;c<this.markers.length;c++){
-    this.markers[c].visible=false;
-    this.markers[c].roll=false;
+    var m=this.markers[c];
+
+    m.visible=false;
+    m.roll=false;
+   
+    var res=this.geo2pos(m.lat,m.lng);
+    var x=res[1];
+      if(x>0 && x<this.w){ 
+      var y=res[0];
+        if(y>0 && y<this.h){ 
+            
+              m.x=x;
+              m.y=y;
+              m.visible=true;
+         }
+
+    }
+
+
   }
 
   if(this.roll!=-1){
@@ -439,12 +457,16 @@ simplegeocanvas.prototype.paint=function(e){
 
    for(var c=0;c<this.markers.length;c++){
     var p=this.markers[c];
-    if(this.currentLayer=="" || p.layer==this.currentLayer)
-     this.paintMarker(p);
+    if(this.currentLayer=="" || p.layer==this.currentLayer){
+      if(p.visible)
+        p.paint(this.ctx,this.sz);
+
+     //this.paintMarker(p);
+    }
   }
 
-  if(this.selected!=-1) this.paintMarker(this.selected);
-  if(this.roll!=-1) this.paintMarker(this.roll);
+  //if(this.selected!=-1) this.paintMarker(this.selected);
+  //if(this.roll!=-1) this.paintMarker(this.roll);
 
   if(this.stats) this.stats.end();
 
@@ -527,7 +549,7 @@ simplegeocanvas.prototype.centerLayer=function(label){
       }
     }
 
-lat=lat/count;
+    lat=lat/count;
     lng=lng/count;
 
      for(var c=0;c<this.markers.length;c++){
@@ -612,6 +634,10 @@ simplegeocanvas.prototype.hashPut=function(){
   var hash="lat="+round_number(this.center.lat,6);
   hash+="&lng="+round_number(this.center.lng,6);
   hash+="&scale="+this.scale;
+   hash+="&layers=";
+  for(var i=0;i<this.layers.length;i++){
+    hash+=""+this.layers[i].label+",";
+  }
   this.addHash(hash);
 }
 

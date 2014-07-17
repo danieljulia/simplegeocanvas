@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
 <link rel='stylesheet'  href='css/style.css' type='text/css' media='all' />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-
+<script src="js/tinycolor.js"></script>
 </head>
 <body id="vis">
 
@@ -40,6 +40,23 @@ var api_url="http://www.pimpampum.net/labs/mapr/api/api.php?method=get_photos&ta
 var mygeo; //simple geo canvas
 
 
+/* define you own marker */
+function marker(lat,lng,tag,txt){
+	this.lat=lat;
+	this.lng=lng;
+	this.tag=tag;
+
+	this.txt=txt;
+}
+
+marker.prototype.paint=function(ctx,sz){
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+	ctx.arc(this.x,this.y,sz*2,0,2*Math.PI);
+    ctx.fill();
+}
+
+
 
 
 $(document).ready(function(){ 
@@ -51,8 +68,8 @@ $(document).ready(function(){
 	mygeo.scale=50;
 
 	searchTag("playa");
-	searchTag("platja");
-	searchTag("barcelona");
+	//searchTag("platja");
+	//searchTag("barcelona");
 
 	for(var i=0;i<1000;i++){ 
 		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
@@ -113,8 +130,16 @@ function searchTag(tag){
 	$.getJSON(api_url+tag+"&callback=?",function(data){
 		console.log("adding markers");
 		mygeo.addLayer(tag_color,tag);
+
+		
+
+
 		$.each(data.res,function(i,val){
-			mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id,tag);
+			var m=new marker(val.lat,val.lng,tag,val.id);
+
+			mygeo.addMarker(m);
+
+			//mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id,tag);
 			
 		});
 	});

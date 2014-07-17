@@ -33,6 +33,17 @@ Blah: <input id="blah" type="checkbox">
 var mygeo; //simple geo canvas
 
 
+/* define you own marker */
+function marker(lat,lng,txt){
+	this.lat=lat;
+	this.lng=lng;
+	this.txt=txt;
+}
+
+marker.prototype.paint=function(ctx){
+
+}
+
 
 
 $(document).ready(function(){ 
@@ -51,7 +62,9 @@ $(document).ready(function(){
 	}
 	mygeo.onClick=function(e){ 
 		console.log("cliked at  :",e.lat,e.lng);
-		mygeo.addMarker(e.lat,e.lng,"#0000ff","Clicked");
+		var m=new marker(e.lat,e.lng);
+
+		mygeo.addMarker(m);
 		
 	}
 
