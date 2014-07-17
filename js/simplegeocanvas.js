@@ -380,7 +380,8 @@ simplegeocanvas.prototype.doUpdate=function(){
 
     m.visible=false;
     m.roll=false;
-   
+   m.selected=false;
+
     var res=this.geo2pos(m.lat,m.lng);
     var x=res[1];
       if(x>0 && x<this.w){ 
@@ -472,6 +473,7 @@ simplegeocanvas.prototype.paint=function(e){
 
 }
 
+/*
 simplegeocanvas.prototype.paintMarker=function(p){
 
     var res=this.geo2pos(p.lat,p.lng);
@@ -497,7 +499,7 @@ simplegeocanvas.prototype.paintMarker=function(p){
          }
 
     }
-}
+}*/
 
 simplegeocanvas.prototype.addLayer=function(color,label){
   this.layers.push({color:color,label:label});
@@ -599,6 +601,7 @@ simplegeocanvas.prototype.doUp=function(e){
   if(d<10){ 
    if(this.roll!=-1){
       this.selected=this.roll;
+      this.selected.selected=true;
    }else{
       this.selected=-1;
    }
@@ -695,11 +698,22 @@ function get_random_color_ex(){
 
 //markers
 
-function geomarker(){
-
+function sgmarker(){
 }
 
- 
+sgmarker.prototype.init=function(lat,lng,layer,txt){
+  this.lat=lat;
+  this.lng=lng;
+  this.tag=layer;
+  this.x=-1000;
+  this.y=-1000;
+  this.txt=txt;
+}
 
-
+sgmarker.prototype.paint=function(ctx,sz){
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+   ctx.arc(this.x,this.y,sz*2,0,2*Math.PI);
+   ctx.fill();
+}
 

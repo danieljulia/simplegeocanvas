@@ -21,11 +21,7 @@ Blah: <input id="blah" type="checkbox">
 </canvas>
 
 
-<div class="controls">
-	<form id="myform" action="javascript:send()">
-	<input id="tag1" type="text" placeholder="type a tag"><input id="button1" type="submit" value="ok">
-	</form>
-</div>
+
 </div>
 
 <script src="js/stats.min.js"></script>
@@ -41,21 +37,27 @@ var mygeo; //simple geo canvas
 
 
 /* define you own marker */
-function marker(lat,lng,tag,txt){
-	this.lat=lat;
-	this.lng=lng;
-	this.tag=tag;
-
-	this.txt=txt;
+function mymarker(){
 }
 
-marker.prototype.paint=function(ctx,sz){
+mymarker.prototype = new sgmarker();
+
+mymarker.prototype.paint=function(ctx,sz){
+
+	
+	if(this.roll){
+		console.log("roll",this.txt);
+		//ctx.fillStyle("ff6600");
+	}
+	if(this.selected){
+		//ctx.fillStyle("ff66ff");
+		console.log("selected",this.txt);
+	}
    ctx.beginPath();
    //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
-	ctx.arc(this.x,this.y,sz*2,0,2*Math.PI);
-    ctx.fill();
+   ctx.arc(this.x,this.y,sz*2*2,0,2*Math.PI);
+   ctx.stroke();
 }
-
 
 
 
@@ -67,13 +69,22 @@ $(document).ready(function(){
 	mygeo.center.lng=2;
 	mygeo.scale=50;
 
+
+	var m=new mymarker();
+	m.init(41,2,"test","test");
+
+	mygeo.addLayer("#ff6666","test");
+	mygeo.addMarker(m);
+	var m2=new mymarker();
+	m2.init(41.1,2,"test","test2")
+
+	mygeo.addMarker(m2);
+	
 	searchTag("playa");
 	//searchTag("platja");
 	//searchTag("barcelona");
 
-	for(var i=0;i<1000;i++){ 
-		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
-	}
+	
 	mygeo.onDown=function(e){ 
 
 	}
@@ -131,11 +142,10 @@ function searchTag(tag){
 		console.log("adding markers");
 		mygeo.addLayer(tag_color,tag);
 
-		
-
 
 		$.each(data.res,function(i,val){
-			var m=new marker(val.lat,val.lng,tag,val.id);
+			var m=new mymarker();
+			m.init(val.lat/1000,val.lng/1000,tag,val.id);
 
 			mygeo.addMarker(m);
 
