@@ -17,7 +17,11 @@ function simplecanvas(div){
   this.stats_has=true;
   this.zoom=1;
   this.debug=true;
+  this.c=0;
 
+    //public properties
+  this.clearing=true;
+  this.background="#aaa";
 }
 
 
@@ -219,12 +223,15 @@ simplecanvas.prototype.paint=function(){
     this.stats.begin();
 
  
+      if(this.clearing || this.c==0){ 
+        this.ctx.fillStyle=this.background;
+        this.ctx.beginPath();
+        this.ctx.fillRect(0,0,this.w,this.h);
+      }
 
-  this.ctx.fillStyle='#aaaaaa';
-    this.ctx.beginPath();
-    this.ctx.fillRect(0,0,this.w,this.h);
     this.onPaint(this);
     if(this.stats) this.stats.end();
+    this.c++;
 
 }
 
@@ -308,14 +315,19 @@ geo canvas
 
 */
 function simplegeocanvas(div){
+  //public properties
+  this.showguides=false;
+  this.scale=50;
+
+  //private
   this.div=div;
   this.center={'lat':0,'lng':0};
   this.zoom=1;
 
   this.layers=new Array();
-  this.scale=50;
+  
   this.markers=new Array();
-  this.showguides=false;
+
   this.sz=2; //size of marker
   this.roll=-1; //current rolled marker
   this.selected=-1; //current selected marker
@@ -412,9 +424,9 @@ simplegeocanvas.prototype.paint=function(e){
     this.stats.begin();
 
 
-   this.ctx.fillStyle = "#000000";
-  this.ctx.fillRect(0,0,this.w,this.h);
-
+    this.ctx.fillStyle =this.background;
+    this.ctx.fillRect(0,0,this.w,this.h);
+  
   //if(this.captured){ 
   this.ctx.beginPath();
   this.ctx.strokeStyle="#666";//rgba(128,128,128,0.5)";
@@ -603,7 +615,13 @@ simplegeocanvas.prototype.doUp=function(e){
       this.selected=this.roll;
       this.selected.selected=true;
    }else{
-      this.selected=-1;
+      var p=this.pos2geo(e.mouseX,e.mouseY);
+        var size=this.pos2geo(this.w,this.h);
+        //todo unify
+  var lng=-p[0]+size[0]/2+this.center.lng;
+  var lat=-p[1]+size[1]/2+this.center.lat;
+
+      this.selected={lat:lat,lng:lng};
    }
    this.onClick(this.selected);
   }

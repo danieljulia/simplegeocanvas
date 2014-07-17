@@ -1,0 +1,72 @@
+<!--
+SimpleGeoCanvas
+By pimpampum.net
+https://github.com/danieljulia/simplegeocanvas
+-->
+
+<!doctype html>
+<html>
+<head>
+<title>Simple Geo Canvas - Drawing</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
+<link rel='stylesheet'  href='css/style.css' type='text/css' media='all' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+
+</head>
+<body id="vis">
+
+
+
+<div id="content">
+<canvas id="mycanvas">
+</canvas>
+</div>
+
+<script src="js/stats.min.js"></script>
+<!-- Only for development version (avoiding cache): -->
+<script>document.write('<script src="js/simplegeocanvas.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
+<script> 
+
+
+
+
+
+var mycanvas; //simple geo canvas
+
+//my data
+var captured=false;
+
+
+$(document).ready(function(){ 
+	mycanvas=new simplecanvas("mycanvas");
+	mycanvas.background="#ff6666";
+	mycanvas.clearing=false;
+	mycanvas.init();
+
+	//capture events
+	mycanvas.onDown=function(e){ 
+		e.ctx.moveTo(e.mouseX,e.mouseY);
+		captured=true;
+	}
+	mycanvas.onUp=function(e){ 
+
+		console.log("up",e);
+		captured=false;
+	}
+	mycanvas.onMove=function(e){ 
+		if(captured){
+			e.ctx.lineTo(e.mouseX,e.mouseY);
+			e.ctx.stroke();
+		}
+	}
+	mycanvas.onPaint=function(e){ 
+		
+
+	}
+});
+
+</script>
+
+</body>
+</html>

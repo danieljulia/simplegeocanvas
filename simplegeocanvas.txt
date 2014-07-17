@@ -1,0 +1,6 @@
+to do list
+----
+
+- Rolling and selected in samples
+- Smoother scrolling and zooming
+- Test enabling layers
