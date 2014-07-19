@@ -1,4 +1,8 @@
-
+<!--
+SimpleGeoCanvas
+By pimpampum.net
+https://github.com/danieljulia/simplegeocanvas
+-->
 <!doctype html>
 <html>
 <head>
@@ -22,11 +26,7 @@ Blah: <input id="blah" type="checkbox">
 </canvas>
 
 
-<div class="controls">
-	<form id="myform" action="javascript:send()">
-	<input id="tag1" type="text" placeholder="type a tag"><input id="button1" type="submit" value="ok">
-	</form>
-</div>
+
 </div>
 
 <script src="js/stats.min.js"></script>
@@ -41,23 +41,63 @@ var api_url="http://www.pimpampum.net/labs/mapr/api/api.php?method=get_photos&ta
 var mygeo; //simple geo canvas
 
 
+/* define you own marker */
+function mymarker(){
+}
+
+mymarker.prototype = new sgmarker();
+
+/* custom paint
+mymarker.prototype.paint=function(ctx,sz){
+
+	
+	if(this.roll){
+		console.log("roll",this.txt);
+		//ctx.fillStyle("ff6600");
+	}
+	if(this.selected){
+		//ctx.fillStyle("ff66ff");
+		console.log("selected",this.txt);
+	}
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+   ctx.arc(this.x,this.y,sz*2*2,0,2*Math.PI);
+   ctx.stroke();
+}
+*/
 
 
 $(document).ready(function(){ 
 
 	mygeo=new simplegeocanvas("mycanvas");
+	mygeo.background="#000";
 	mygeo.init();
 	mygeo.center.lat=41;
 	mygeo.center.lng=2;
 	mygeo.scale=50;
 
+
+	var m=new mymarker();
+	m.init(41,2,"test","test");
+
+	mygeo.addLayer("#ff6666","test");
+	mygeo.addLayer("#6666ff","test2");
+
+	mygeo.addMarker(m,"test");
+	var m2=new mymarker();
+	m2.init(41.1,2,"test","test2")
+
+	mygeo.addMarker(m2,"test2");
+	
 	searchTag("playa");
+<<<<<<< HEAD
 	//searchTag("platja");
+=======
+	searchTag("platja");
+>>>>>>> markerclass
 	//searchTag("barcelona");
 
-	for(var i=0;i<1000;i++){ 
-		//mygeo.addMarker(Math.random()*10-5,Math.random()*10-5,"#ff0000","A test");
-	}
+	
 	mygeo.onDown=function(e){ 
 
 	}
@@ -114,8 +154,15 @@ function searchTag(tag){
 	$.getJSON(api_url+tag+"&callback=?",function(data){
 		console.log("adding markers");
 		mygeo.addLayer(tag_color,tag);
+
+
 		$.each(data.res,function(i,val){
-			mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id,tag);
+			var m=new mymarker();
+			m.init(val.lat/1000,val.lng/1000,tag,val.id);
+
+			mygeo.addMarker(m,tag);
+
+			//mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id,tag);
 			
 		});
 	});

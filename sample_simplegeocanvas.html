@@ -1,4 +1,8 @@
-
+<!--
+SimpleGeoCanvas
+By pimpampum.net
+https://github.com/danieljulia/simplegeocanvas
+-->
 <!doctype html>
 <html>
 <head>
@@ -15,7 +19,6 @@
 <div id="content">
 <div class="menu">
 Show grid: <input id="showgrid" type="checkbox">
-Blah: <input id="blah" type="checkbox">
 </div>
 <canvas id="mycanvas">
 </canvas>
@@ -35,8 +38,12 @@ var mygeo; //simple geo canvas
 
 
 
+
 $(document).ready(function(){ 
 	mygeo=new simplegeocanvas("mycanvas");
+	mygeo.background="#fff";
+	mygeo.showguides=true;
+
 	mygeo.init();
 
 	for(var i=0;i<1000;i++){ 
@@ -50,17 +57,26 @@ $(document).ready(function(){
 		
 	}
 	mygeo.onClick=function(e){ 
-		console.log("cliked at  :",e.lat,e.lng);
-		mygeo.addMarker(e.lat,e.lng,"#0000ff","Clicked");
+		console.log("cliked at  :",e,e.lat,e.lng);
+		var m=new sgmarker();
+		m.init(e.lat,e.lng);
+
+		mygeo.addMarker(m);
 		
 	}
 
 	mygeo.onMove=function(e){ 
-		
+		//console.log("moved at  :",e);
 
 	}
 	mygeo.onPaint=function(e){ 
 		
+
+
+	}
+
+	mygeo.onRoll=function(e){ 
+		console.log("rolling",e);
 
 
 	}
