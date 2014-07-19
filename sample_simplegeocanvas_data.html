@@ -46,6 +46,7 @@ function mymarker(){
 
 mymarker.prototype = new sgmarker();
 
+/* custom paint
 mymarker.prototype.paint=function(ctx,sz){
 
 	
@@ -62,12 +63,13 @@ mymarker.prototype.paint=function(ctx,sz){
    ctx.arc(this.x,this.y,sz*2*2,0,2*Math.PI);
    ctx.stroke();
 }
-
+*/
 
 
 $(document).ready(function(){ 
 
 	mygeo=new simplegeocanvas("mycanvas");
+	mygeo.background="#000";
 	mygeo.init();
 	mygeo.center.lat=41;
 	mygeo.center.lng=2;
@@ -78,14 +80,16 @@ $(document).ready(function(){
 	m.init(41,2,"test","test");
 
 	mygeo.addLayer("#ff6666","test");
-	mygeo.addMarker(m);
+	mygeo.addLayer("#6666ff","test2");
+
+	mygeo.addMarker(m,"test");
 	var m2=new mymarker();
 	m2.init(41.1,2,"test","test2")
 
-	mygeo.addMarker(m2);
+	mygeo.addMarker(m2,"test2");
 	
 	searchTag("playa");
-	//searchTag("platja");
+	searchTag("platja");
 	//searchTag("barcelona");
 
 	
@@ -151,7 +155,7 @@ function searchTag(tag){
 			var m=new mymarker();
 			m.init(val.lat/1000,val.lng/1000,tag,val.id);
 
-			mygeo.addMarker(m);
+			mygeo.addMarker(m,tag);
 
 			//mygeo.addMarker(val.lat/1000,val.lng/1000,tag_color,val.id,tag);
 			

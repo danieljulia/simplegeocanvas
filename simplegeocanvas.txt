@@ -3,4 +3,6 @@ to do list
 
 - Rolling and selected in samples
 - Smoother scrolling and zooming
-- Test enabling layers
+- Test enabling layers, deleting,etc
+- colors in layers
+- improve hashing (do it optional)
