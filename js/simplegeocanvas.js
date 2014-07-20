@@ -18,7 +18,7 @@ function simplecanvas(div){
   this.zoom=1;
   this.debug=true;
   this.c=0;
-
+  this.max_scale=50000;
     //public properties
   this.clearing=true;
   this.background="#aaa";
@@ -375,9 +375,9 @@ simplegeocanvas.prototype.addMarker=function(m,layer){
 
 simplegeocanvas.prototype.doUpdate=function(){
 
-  this.center.lat+=(this.dcenter.lat-this.center.lat)/8;
-  this.center.lng+=(this.dcenter.lng-this.center.lng)/8;
-  this.scale+=(this.dscale-this.scale)/8;
+  this.center.lat+=(this.dcenter.lat-this.center.lat)/2;
+  this.center.lng+=(this.dcenter.lng-this.center.lng)/2;
+  this.scale+=(this.dscale-this.scale)/2;
 
   var dtrigger=20;
   var dmin=100;
@@ -595,10 +595,14 @@ simplegeocanvas.prototype.removeLayer=function(label){
 }
 
 simplegeocanvas.prototype.setCenter=function(lat,lng){
-  this.center.lat=lat;
-  this.center.lng=lng;
+ // this.center.lat=lat;
+ // this.center.lng=lng;
   this.dcenter.lat=lat;
   this.dcenter.lng=lng;
+}
+
+simplegeocanvas.prototype.setScale=function(sc){
+  this.dscale=sc;
 }
 
 simplegeocanvas.prototype.selectLayer=function(label){
@@ -650,7 +654,8 @@ simplegeocanvas.prototype.centerLayer=function(label){
 
 simplegeocanvas.prototype.doScale=function(sc){
     this.dscale=this.dscale*sc;
-    if(this.dscale>12000) this.dscale=12000;
+    if(this.dscale>this.max_scale) this.dscale=this.max_scale;
+    if(this.dscale<1) this.dscale=1;
      this.intentHash();;
 
 
@@ -722,15 +727,27 @@ simplegeocanvas.prototype.onRoll=function(e){
 }
 
 simplegeocanvas.prototype.hashGet=function(e){
+  var params=this.getHashParams();
+  console.log(params);
+  if(params.lat && params.lng){ 
+   this.setCenter(parseFloat(params.lat),parseFloat(params.lng));
+}
+  if(params.scale){ 
+   this.setScale(parseFloat(params.scale));
+}
+  this.onHashed(params);
 
 }
 
+simplegeocanvas.prototype.onHashed=function(hash){
+  console.log("on hashed");
+}
 
 simplegeocanvas.prototype.hashPut=function(){
   //can become very slow
   var hash="lat="+round_number(this.center.lat,6);
   hash+="&lng="+round_number(this.center.lng,6);
-  hash+="&scale="+this.scale;
+  hash+="&scale="+parseInt(this.scale);
    hash+="&layers=";
   for(var i=0;i<this.layers.length;i++){
     hash+=""+this.layers[i].label+",";
@@ -739,6 +756,21 @@ simplegeocanvas.prototype.hashPut=function(){
   this.hashing=false;
 
 
+}
+
+simplegeocanvas.prototype.getHashParams=function(){
+
+    var hashParams = {};
+    var e,
+        a = /\+/g,  // Regex for replacing addition symbol with a space
+        r = /([^&;=]+)=?([^&;]*)/g,
+        d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+        q = window.location.hash.substring(1);
+
+    while (e = r.exec(q))
+       hashParams[d(e[1])] = d(e[2]);
+
+    return hashParams;
 }
 
 
