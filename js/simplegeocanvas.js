@@ -19,9 +19,11 @@ function simplecanvas(div){
   this.debug=true;
   this.c=0;
   this.max_scale=50000;
+
     //public properties
   this.clearing=true;
   this.background="#aaa";
+ // this.fullscreen=false;
 }
 
 
@@ -83,6 +85,14 @@ simplecanvas.prototype.initEvents=function(){
     });
 
 */
+
+      $(this.mycanvas).live('mouseout', function(e){
+        ref.doUp(ref);
+
+        ref.mouseX=-1000;
+        ref.mouseY=-1000;
+       
+      });
 
 
      $(this.mycanvas).live('touchstart', function(e){
@@ -177,6 +187,8 @@ simplecanvas.prototype.initEvents=function(){
 }
 
 
+
+
 simplecanvas.prototype.pinchDist=function(e){
     var x1 = Math.floor(e.originalEvent.touches[0].pageX/this.zoom);
     var y1 = Math.floor(e.originalEvent.touches[0].pageY/this.zoom);
@@ -185,7 +197,7 @@ simplecanvas.prototype.pinchDist=function(e){
 
     var mx=(x1+x2)/2;
     var my=(y1+y2)/2;
-    var d=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+    var d=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))|0;
     return d;
 }
 
@@ -193,18 +205,20 @@ simplecanvas.prototype.pinchDist=function(e){
 
 
 simplecanvas.prototype.respondCanvas=function(){
+  //if(this.fullscreen){ 
 
-  this.w=$(this.container).width();
-  this.h=$(this.container).height();
-  
-//$('#content').attr('height', w/rzoom-58); 
+    this.w=$(this.container).width();
+    this.h=$(this.container).height();
+    
+  //$('#content').attr('height', w/rzoom-58); 
 
-  //tamaño en pixels del canvas
-  console.log("size changed",this.w,this.h);
-  console.log(this);
-  $(this.mycanvas).attr('width', this.w/this.zoom); //max width
-   $(this.mycanvas).attr('height', this.h/this.zoom ); //max height
-  
+    //tamaño en pixels del canvas
+    console.log("size changed",this.w,this.h);
+    console.log(this);
+    $(this.mycanvas).attr('width', this.w/this.zoom); //max width
+     $(this.mycanvas).attr('height', this.h/this.zoom ); //max height
+  //}
+
   this.update();
 
 }
@@ -342,7 +356,7 @@ function simplegeocanvas(div){
   this.selected=false; //current selected marker
 
   this.currentLayer="";
-
+  this.rini={x:0,y:0};
   
   var self=this;
   /*
@@ -355,8 +369,8 @@ function simplegeocanvas(div){
 simplegeocanvas.prototype = new simplecanvas(this.div );
 
 simplegeocanvas.prototype.geo2pos=function(lat,lng){
-  var x=Math.floor((-lat+this.center.lat)*this.scale+(this.h/2));
-  var y=Math.floor((lng-this.center.lng)*this.scale+(this.w/2));
+  var x=Math.floor((-lat+this.center.lat)*this.scale+(this.h/2))|0;
+  var y=Math.floor((lng-this.center.lng)*this.scale+(this.w/2))|0;
   return [x,y];
 }
 
@@ -384,9 +398,10 @@ simplegeocanvas.prototype.doUpdate=function(){
  
   this.roll=false;
 
-
-     for(var l=0;l<this.layers.length;l++){
-         for(var c=0;c<this.layers[l].markers.length;c++){
+    var num=this.layers.length;
+     for(var l=0;l<num;l++){
+      var num2=this.layers[l].markers.length;
+         for(var c=0;c<num2;c++){
 
 
     var p=this.layers[l].markers[c];
@@ -408,8 +423,9 @@ simplegeocanvas.prototype.doUpdate=function(){
 
 
 
-     for(var l=0;l<this.layers.length;l++){
-         for(var c=0;c<this.layers[l].markers.length;c++){
+     for(var l=0;l<num;l++){
+      var num2=this.layers[l].markers.length;
+         for(var c=0;c<num2;c++){
     var m=this.layers[l].markers[c];
 
     m.visible=false;
@@ -436,6 +452,8 @@ simplegeocanvas.prototype.doUpdate=function(){
   if(this.roll){
     this.roll.roll=true;
      this.onRoll(this.roll);
+  }else{
+    this.onRoll(false);
   }
 
 
@@ -492,10 +510,14 @@ simplegeocanvas.prototype.paint=function(e){
     if(this.sz<1) this.sz=1;
 
      for(var l=0;l<this.layers.length;l++){
-         for(var c=0;c<this.layers[l].markers.length;c++){
-          //change color
-          this.ctx.fillStyle = this.layers[l].color;
+      var num2=this.layers[l].markers.length;
+       //change color
+      this.ctx.fillStyle = this.layers[l].color;
           this.ctx.strokeStyle = this.layers[l].color;
+
+         for(var c=0;c<num2;c++){
+         
+          
           var p=this.layers[l].markers[c];
           //if(this.currentLayer=="" || p.layer==this.currentLayer){
             if(p.visible)
@@ -509,10 +531,10 @@ simplegeocanvas.prototype.paint=function(e){
 
      this.ctx.fillStyle = "ffff66";
      if(this.roll){
-          this.roll.paint(this.ctx,this.sz);
+          this.roll.paintRoll(this.ctx,this.sz);
      }
      if(this.selected){
-          this.selected.paint(this.ctx,this.sz);
+          this.selected.paintSelected(this.ctx,this.sz);
      }
   
 
@@ -554,11 +576,11 @@ simplegeocanvas.prototype.paintMarker=function(p){
 //todo change
 simplegeocanvas.prototype.locExists=function(lat,lng,label){
   var layer=this.getLayer(label);
-
-  for(var i=0;i<layer.markers.length;i++){
+var num=layer.markers.length;
+  for(var i=0;i<num;i++){
     var m=layer.markers[i];
     if(m.lat==lat){
-      if(m.ln==lng){
+      if(m.lng==lng){
         return true;
       }
     }
@@ -683,16 +705,18 @@ simplegeocanvas.prototype.doUp=function(e){
    if(this.roll){
       this.selected=this.roll;
       this.selected.selected=true;
+       this.onClick(this.roll);
    }else{
       var p=this.pos2geo(e.mouseX,e.mouseY);
         var size=this.pos2geo(this.w,this.h);
         //todo unify
-  var lng=-p[0]+size[0]/2+this.center.lng;
-  var lat=-p[1]+size[1]/2+this.center.lat;
+    var lng=-p[0]+size[0]/2+this.center.lng;
+    var lat=-p[1]+size[1]/2+this.center.lat;
 
       this.selected=false;;
+       this.onClick({lat:lat,lng:lng});
    }
-   this.onClick({lat:lat,lng:lng});
+  
   }
 }
 simplegeocanvas.prototype.doMove=function(e){
@@ -800,14 +824,52 @@ sgmarker.prototype.init=function(lat,lng,layer,txt){
   this.x=-1000;
   this.y=-1000;
   this.txt=txt;
+  this.c=-Math.random()*10|0;
 }
 
 sgmarker.prototype.paint=function(ctx,sz){
+  this.c++;
+  if(this.c<0){
+    return;
+  }
    ctx.beginPath();
    //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
    ctx.arc(this.x,this.y,sz*2,0,2*Math.PI);
    ctx.fill();
 }
+
+sgmarker.prototype.paintRoll=function(ctx,sz){
+  ctx.fillStyle = "ffff66";
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+   ctx.arc(this.x,this.y,sz*2,0,2*Math.PI);
+   ctx.fill();
+
+
+  ctx.strokeStyle = "ffff66";
+  ctx.lineWidth = 2;
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+   ctx.arc(this.x,this.y,sz*2*10,0,2*Math.PI);
+   ctx.stroke();
+}
+
+sgmarker.prototype.paintSelected=function(ctx,sz){
+  ctx.fillStyle = "ffff66";
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+   ctx.arc(this.x,this.y,sz*2,0,2*Math.PI);
+   ctx.fill();
+
+
+  ctx.strokeStyle = "ffff66";
+  ctx.lineWidth = 2;
+   ctx.beginPath();
+   //this.ctx.fillRect(x-this.sz,y-this.sz,this.sz*2,this.sz*2);
+   ctx.arc(this.x,this.y,sz*2*10,0,2*Math.PI);
+   ctx.stroke();
+}
+
 
 
 
@@ -834,8 +896,11 @@ function get_random_color() {
 
 function get_random_color_ex(){
   //120 different colors
-  var ch=(Math.floor( Math.random()*360));
-  var col=tinycolor({ h: ch, s: 60+Math.floor(Math.random()*40), v: 100 });
+  var ch=(Math.floor( Math.random()*30)*12);
+  var s=80;
+  if(Math.random()>0.5) s+=20;
+  // if(Math.random()>0.5) s+=20;
+  var col=tinycolor({ h: ch, s: s, v: 100 });
   var color="rgba("+Math.floor(col._r)+","+Math.floor(col._g)+","+Math.floor(col._b)+","+0.7+")";
   return color;
 
